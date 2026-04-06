@@ -1,29 +1,47 @@
 pipeline {
-    agent any
+    agent { label 'Jenkins-Worker-01' }
 
-    tools {
-        maven 'Maven' // Adjust tool name based on Jenkins configuration
+    triggers {
+        githubPush()
     }
 
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main',
+                credentialsId: 'github-creds',
+                url: 'https://github.com/rachanadixit/Spring-boot-project.git'
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building and Packaging Spring Boot Project'
-                sh 'mvn clean package -DskipTests'
+                sh 'mvn clean compile'
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Running tests'
                 sh 'mvn test'
             }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh '''
+                fuser -k 8081/tcp || true
+                nohup java -jar target/*.jar > app.log 2>&1 &
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build Success'
+        }
+        failure {
+            echo 'Build Failed'
         }
     }
 }
