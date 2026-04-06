@@ -6,31 +6,35 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
+                echo 'Pulling latest code...'
                 git branch: 'main',
-                credentialsId: 'github-creds',
                 url: 'https://github.com/rachanadixit/Spring-boot-project.git'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'mvn clean compile'
+                echo 'Building project using Maven...'
+                bat 'mvn clean compile'
             }
         }
 
         stage('Test') {
             steps {
-                sh 'mvn test'
+                echo 'Running tests...'
+                bat 'mvn test'
             }
         }
 
         stage('Deploy') {
             steps {
-                sh '''
-                fuser -k 8081/tcp || true
-                nohup java -jar target/*.jar > app.log 2>&1 &
+                echo 'Deploying application...'
+                bat '''
+                taskkill /F /IM java.exe || exit 0
+                start java -jar target\\*.jar
                 '''
             }
         }
@@ -38,10 +42,10 @@ pipeline {
 
     post {
         success {
-            echo 'Build Success'
+            echo 'Build Success: Application Deployed!'
         }
         failure {
-            echo 'Build Failed'
+            echo 'Build Failed!'
         }
     }
 }
