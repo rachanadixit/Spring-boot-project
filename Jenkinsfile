@@ -9,7 +9,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                echo 'Pulling latest code...'
+                echo 'Pulling latest code from GitHub...'
                 git branch: 'main',
                 url: 'https://github.com/rachanadixit/Spring-boot-project.git'
             }
@@ -17,8 +17,8 @@ pipeline {
 
         stage('Build') {
             steps {
-                echo 'Building project using Maven...'
-                bat 'C:\\maven\\bin\\mvn clean compile'
+                echo 'Building project (creating JAR)...'
+                bat 'C:\\maven\\bin\\mvn clean package'
             }
         }
 
@@ -31,10 +31,11 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo 'Deploying application...'
+                echo 'Deploying application on port 8081...'
                 bat '''
                 taskkill /F /IM java.exe || exit 0
-                start java -jar target\\*.jar
+                cd target
+                start cmd /c "java -jar *.jar > app.log 2>&1"
                 '''
             }
         }
