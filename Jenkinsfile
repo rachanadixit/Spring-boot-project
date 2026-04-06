@@ -18,14 +18,14 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building project using Maven...'
-                bat 'mvn clean compile'
+                bat 'C:\\maven\\bin\\mvn clean compile'
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Running tests...'
-                bat 'mvn test'
+                bat 'C:\\maven\\bin\\mvn test'
             }
         }
 
